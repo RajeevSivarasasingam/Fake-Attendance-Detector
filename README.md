@@ -121,7 +121,3 @@ Action: Lecturers can apply a "Random Cancellation" penalty if fake signatures a
 │   ├── app.json           # Expo config (Permissions)
 │   └── package.json       # JS dependencies
 └── README.md
-
-S.G. Fernando (2021/ICT/127)
-
-Supervisor: Dr. T. Kartheeswaran
