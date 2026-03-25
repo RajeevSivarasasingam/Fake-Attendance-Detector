@@ -122,21 +122,6 @@ Action: Lecturers can apply a "Random Cancellation" penalty if fake signatures a
 │   └── package.json       # JS dependencies
 └── README.md
 
-
-👥 Group 14 Members
-
-L.D.A. Silva (2021/ICT/10)
-
-D.M.K.I. Dissanayake (2021/ICT/53)
-
-U.G.A. Ekanayake (2021/ICT/61)
-
-D.M.E.D. Nawodi (2021/ICT/77)
-
-S. Rajeev (2021/ICT/102)
-
-M.S.F. Shahla (2021/ICT/126)
-
-D.S.G. Fernando (2021/ICT/127)
+S.G. Fernando (2021/ICT/127)
 
 Supervisor: Dr. T. Kartheeswaran
