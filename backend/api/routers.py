@@ -17,6 +17,27 @@ class VerificationResponse(BaseModel):
     match: bool
     status: str
 
+class VerificationRequest(BaseModel):
+    headcount: int
+    present_count: int
+    absent_count: int
+
+# Allowed file types for upload
+ALLOWED_IMAGE_TYPES = {
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/webp'
+}
+
+# Helper to validate file type
+def validate_file_type(upload_file: UploadFile) -> None:
+    if upload_file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Allowed types: {', '.join(ALLOWED_IMAGE_TYPES)}"
+        )
+
 # Helper to save uploaded files temporarily
 def save_upload_file(upload_file: UploadFile, destination: str) -> None:
     try:
@@ -32,6 +53,8 @@ async def get_headcount(file: UploadFile = File(...)):
     """
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded")
+    
+    validate_file_type(file)
     
     file_path = f"temp_{file.filename}"
     save_upload_file(file, file_path)
@@ -53,6 +76,8 @@ async def process_sign_sheet(file: UploadFile = File(...)):
     if not file.filename:
          raise HTTPException(status_code=400, detail="No file uploaded")
 
+    validate_file_type(file)
+
     file_path = f"temp_sheet_{file.filename}"
     save_upload_file(file, file_path)
 
@@ -70,17 +95,17 @@ async def process_sign_sheet(file: UploadFile = File(...)):
 
 
 @router.post("/verify", response_model=VerificationResponse)
-async def verify_attendance(headcount: int, present_count: int, absent_count: int):
+async def verify_attendance(request: VerificationRequest):
     """
     Compares the headcount with the present count from the sign sheet.
     """
-    match = headcount == present_count
+    match = request.headcount == request.present_count
     status = "Attendance verified" if match else "Mismatch detected. Please trigger face recognition."
     
     return VerificationResponse(
-        headcount=headcount,
-        sign_sheet_present=present_count,
-        sign_sheet_absent=absent_count,
+        headcount=request.headcount,
+        sign_sheet_present=request.present_count,
+        sign_sheet_absent=request.absent_count,
         match=match,
         status=status
     )
@@ -93,6 +118,8 @@ async def perform_face_recognition(file: UploadFile = File(...)):
     """
     if not file.filename:
          raise HTTPException(status_code=400, detail="No file uploaded")
+
+    validate_file_type(file)
 
     file_path = f"temp_face_{file.filename}"
     save_upload_file(file, file_path)
