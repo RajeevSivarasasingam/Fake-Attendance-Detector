@@ -18,7 +18,12 @@ export default function VerificationResult({ route, navigation }) {
   const verifyAttendance = async () => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/verify?headcount=${headcount}&present_count=${present_count}&absent_count=${absent_count}`
+        `${API_BASE_URL}/verify`,
+        {
+          headcount,
+          present_count,
+          absent_count
+        }
       );
       setVerificationResult(response.data);
     } catch (error) {
