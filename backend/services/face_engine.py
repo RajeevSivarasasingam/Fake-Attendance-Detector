@@ -1,6 +1,7 @@
 import face_recognition
 import cv2
 import os
+import numpy as np
 
 # In a real app, these encodings would come from a database associated with student IDs
 # For this example, we'll assume a 'known_faces' directory exists
@@ -36,15 +37,14 @@ def load_known_faces():
     return known_names, known_encodings
 
 # Load these once on startup to save time during requests
-# known_names, known_encodings = load_known_faces()
+known_names, known_encodings = load_known_faces()
 
 def recognize_faces(image_path: str) -> list[str]:
     """
     Identifies faces in a given classroom image and matches them 
     against known student face encodings.
     """
-    known_names, known_encodings = load_known_faces()
-    
+    # Use the globally loaded known faces instead of reloading
     if not known_encodings:
          return ["No known faces recorded in the system."]
     
@@ -59,19 +59,16 @@ def recognize_faces(image_path: str) -> list[str]:
     
     # Loop over each found face in the classroom
     for unknown_encoding in face_encodings:
-        # Check against known faces
-        matches = face_recognition.compare_faces(known_encodings, unknown_encoding)
-        name = "Unknown Student"
+        # Find the closest match using face distance for better accuracy
+        face_distances = face_recognition.face_distance(known_encodings, unknown_encoding)
+        best_match_index = np.argmin(face_distances)
         
-        # Or, we can find the closest match mathematically
-        # face_distances = face_recognition.face_distance(known_encodings, unknown_encoding)
-        # best_match_index = np.argmin(face_distances)
-        # if matches[best_match_index]:
-        #     name = known_names[best_match_index]
-        
-        if True in matches:
-            first_match_index = matches.index(True)
-            name = known_names[first_match_index]
+        # Use a tolerance threshold to determine if it's a match
+        # Lower tolerance = stricter matching
+        if face_distances[best_match_index] < 0.6:
+            name = known_names[best_match_index]
+        else:
+            name = "Unknown Student"
             
         identified.append(name)
         
